@@ -1,0 +1,38 @@
+{
+    "name": "olilaban/laravel-pbkdf2-hasher",
+    "description": "A PBKDF2 hash driver for Laravel applications.",
+    "homepage": "https://github.com/oli-laban/laravel-pbkdf2-hasher",
+    "keywords": [
+        "laravel",
+        "pbkdf2",
+        "password",
+        "hash",
+        "driver"
+    ],
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "laravel/framework": "^12.1"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.7",
+        "orchestra/testbench": "^10.1",
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Olilaban\\LaravelPbkdf2Hasher\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Oli Laban",
+            "email": "oli@olilaban.dev"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
