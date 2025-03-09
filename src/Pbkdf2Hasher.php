@@ -6,18 +6,32 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Hashing\AbstractHasher;
 use SensitiveParameter;
 
+/**
+ * @phpstan-type Options array{
+ *      'algo'?: non-falsy-string,
+ *      'iterations'?: int<1, max>,
+ *      'hash_length'?: int<1, max>,
+ *      'salt_length'?: int<1, max>,
+ *  }
+ */
 class Pbkdf2Hasher extends AbstractHasher implements Hasher
 {
+    /** @var non-falsy-string */
     protected string $algo = 'sha256';
 
+    /** @var int<1, max> */
     protected int $iterations = 210000;
 
+    /** @var int<1, max> */
     protected int $hashLength = 32;
 
+    /** @var int<1, max> */
     protected int $saltLength = 16;
 
+    /** @var callable(int): string */
     protected $saltGenerator;
 
+    /** @param Options $options */
     public function __construct(array $options = [], ?callable $saltGenerator = null)
     {
         $this->algo = $options['algo'] ?? $this->algo;
@@ -27,6 +41,7 @@ class Pbkdf2Hasher extends AbstractHasher implements Hasher
         $this->saltGenerator = $saltGenerator ?? fn ($length) => random_bytes($length);
     }
 
+    /** @param Options $options */
     public function make(
         #[SensitiveParameter] $value,
         array $options = [],
@@ -46,8 +61,9 @@ class Pbkdf2Hasher extends AbstractHasher implements Hasher
         return "pbkdf2-$algo$".$iterations.'$'.$encodedSalt.'$'.$encodedHash;
     }
 
+    /** @param Options $options */
     public function check(
-        #[\SensitiveParameter] $value,
+        #[SensitiveParameter] $value,
         $hashedValue,
         array $options = [],
     ): bool {
@@ -73,6 +89,8 @@ class Pbkdf2Hasher extends AbstractHasher implements Hasher
         return hash_equals($info['hash'], $hash);
     }
 
+
+    /** @param Options $options */
     public function needsRehash($hashedValue, array $options = []): bool
     {
         $algo = $options['algo'] ?? $this->algo;
@@ -89,6 +107,16 @@ class Pbkdf2Hasher extends AbstractHasher implements Hasher
             || $info['salt_length'] !== $saltLength;
     }
 
+    /**
+     * @return array{
+     *     'algo': non-falsy-string,
+     *     'iterations': int<1, max>,
+     *     'salt': non-falsy-string,
+     *     'salt_length': int<1, max>,
+     *     'hash': non-falsy-string,
+     *     'hash_length': int<1, max>,
+     * }|null
+     */
     public function info($hashedValue): ?array
     {
         $parts = explode('$', $hashedValue);
@@ -116,6 +144,12 @@ class Pbkdf2Hasher extends AbstractHasher implements Hasher
         ];
     }
 
+    /**
+     * @phpstan-assert-if-true non-falsy-string $algo
+     * @phpstan-assert-if-true int<1, max> $iterations
+     * @phpstan-assert-if-true non-falsy-string $salt
+     * @phpstan-assert-if-true non-falsy-string $hash
+     */
     protected function validateParts(
         string $algo,
         ?int $iterations,
